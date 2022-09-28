@@ -1,0 +1,42 @@
+version: '3'
+services:
+  django:
+    build: app
+    expose:
+      - "8000"
+    volumes:
+      - static_volume:/opt/app/static
+    depends_on:
+      - db
+
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./configs:/etc/nginx/conf.d:ro
+      - ./data:/data/:ro
+      - static_volume:/staticfiles/static
+    depends_on:
+      - django
+    ports:
+      - "8000:80"
+
+  db:
+    build: postgres
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  # We can make it depend on django because it already uses wait_for_db, so that we can be sure
+  # that etl won't start until postgres is ready
+  etl:
+    build: etl
+    command: sh -c './wait-for db:5432 -- sleep 5 && python load_data.py && echo "Migration done"'
+    depends_on:
+      - django
+
+volumes:
+  static_volume:
+  db_data:
