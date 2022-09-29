@@ -26,8 +26,8 @@ services:
     build: postgres
     volumes:
       - db_data:/var/lib/postgresql/data
-    expose:
-      - "5432"
+    ports:
+      - "5432:5432"
 
   # We can make it depend on django because it already uses wait_for_db, so that we can be sure
   # that etl won't start until postgres is ready
