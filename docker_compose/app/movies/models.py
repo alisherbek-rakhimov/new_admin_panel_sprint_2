@@ -2,7 +2,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from .mixins import UUIDMixin, TimeStampedMixin
+from .mixins import UUIDMixin, TimeStampedMixin, RoleType
 
 
 class Genre(UUIDMixin, TimeStampedMixin):
@@ -82,11 +82,6 @@ class Person(UUIDMixin, TimeStampedMixin):
 class PersonFilmwork(UUIDMixin):
     film_work = models.ForeignKey(Filmwork, on_delete=models.CASCADE)
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
-
-    class RoleType(models.TextChoices):
-        ACTOR = 'actor', _('actor')
-        PRODUCER = 'producer', _('producer')
-        DIRECTOR = 'director', _('director')
 
     role = models.TextField(_('role'), choices=RoleType.choices, null=True)
 

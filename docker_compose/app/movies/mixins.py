@@ -1,5 +1,7 @@
 import uuid
 from django.db import models
+from django.utils.translation import gettext_lazy as _
+
 
 class TimeStampedMixin(models.Model):
     # auto_now_add автоматически выставит дату создания записи
@@ -19,3 +21,9 @@ class UUIDMixin(models.Model):
 
     class Meta:
         abstract = True
+
+
+class RoleType(models.TextChoices):
+    ACTOR = 'actor', _('actor')
+    WRITER = 'writer', _('writer')
+    DIRECTOR = 'director', _('director')

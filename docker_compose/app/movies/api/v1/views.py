@@ -3,8 +3,11 @@ from django.db.models import Q, Min, Max, Avg, F
 from django.http import JsonResponse
 from django.views.generic.detail import BaseDetailView
 from django.views.generic.list import BaseListView
+from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from movies.models import Filmwork
+from movies.mixins import RoleType
 
 
 class MoviesApiMixin:
@@ -12,11 +15,15 @@ class MoviesApiMixin:
     http_method_names = ['get']
 
     def get_queryset(self):
+        # role = models.TextField(_('role'), choices=self.RoleType.choices, null=True)
+
         res = Filmwork.objects.values() \
             .annotate(genres=ArrayAgg('genres__name', distinct=True)) \
-            .annotate(actors=ArrayAgg('persons__full_name', filter=Q(personfilmwork__role='actor'), distinct=True)) \
-            .annotate(writers=ArrayAgg('persons__full_name', filter=Q(personfilmwork__role='writer'), distinct=True)) \
-            .annotate(directors=ArrayAgg('persons__full_name', filter=Q(personfilmwork__role='director'),
+            .annotate(actors=ArrayAgg('persons__full_name', filter=Q(personfilmwork__role=RoleType.ACTOR),
+                                      distinct=True)) \
+            .annotate(writers=ArrayAgg('persons__full_name', filter=Q(personfilmwork__role=RoleType.WRITER),
+                                       distinct=True)) \
+            .annotate(directors=ArrayAgg('persons__full_name', filter=Q(personfilmwork__role=RoleType.DIRECTOR),
                                          distinct=True)) \
             .order_by('id')
 
